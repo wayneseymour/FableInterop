@@ -41,33 +41,23 @@ match parseFloat "5x" with
 | Some result -> console.log(result)       //  Parsing fails as it should
 | None -> console.log("No result found")   //  logs "No result found"
 
-type IJQuery = interface end
+
+type IJQuery = 
+  abstract css : string * string -> IJQuery
+  abstract addClass : string -> IJQuery
+  [<Emit("$0.click($1)")>]
+  abstract onClick : (obj -> unit) -> IJQuery
 
 
 module JQuery = 
-
   [<Emit("window['$']($0)")>]
   let select (selector: string) : IJQuery = jsNative
 
 
-  [<Emit("window['$']($0)")>]
-  let ready (handler: unit -> unit) : unit = jsNative
-  
-  [<Emit("$2.css($0, $1)")>]
-  let css (prop: string) (value: string) (el: IJQuery) : IJQuery = jsNative
-  
-  [<Emit("$1.addClass($0)")>]
-  let addClass (className: string) (el: IJQuery) : IJQuery = jsNative
-  
-  [<Emit("$1.click($0)")>]
-  let click (handler: obj -> unit)  (el: IJQuery) : IJQuery = jsNative
-
-JQuery.ready (fun () ->
-   let div = JQuery.select "#main"
- 
-   div
-   |> JQuery.css "background-color" "red"
-   |> JQuery.click (fun ev -> console.log("Clicked"))
-   |> JQuery.addClass "fancy-class"
-   |> ignore
-)
+// I like the more λ-ish style from the previous commits.
+JQuery.select("#main")
+      .css("background-color","lightblue")
+      .css("font-size", "24px")
+      .onClick(fun ev -> console.log("clicked"))
+      .addClass("fancy-class")
+      |> ignore
