@@ -42,22 +42,16 @@ match parseFloat "5x" with
 | None -> console.log("No result found")   //  logs "No result found"
 
 
-type IJQuery = 
-  abstract css : string * string -> IJQuery
-  abstract addClass : string -> IJQuery
-  [<Emit("$0.click($1)")>]
-  abstract onClick : (obj -> unit) -> IJQuery
-
-
 module JQuery = 
   [<Emit("window['$']($0)")>]
-  let select (selector: string) : IJQuery = jsNative
+  let select (selector: string) = jsNative
+  
+let div = JQuery.select "#main"
 
+// here comes the dynamic programming model:
+!!div?css("any","prop")?html("non-empty")?fade(400) 
 
-// I like the more λ-ish style from the previous commits.
-JQuery.select("#main")
-      .css("background-color","lightblue")
-      .css("font-size", "24px")
-      .onClick(fun ev -> console.log("clicked"))
-      .addClass("fancy-class")
-      |> ignore
+// will compile to:
+// const div = window['$']("#main")
+//
+// div.css("any", "prop").html("non-empty").fade(400)
