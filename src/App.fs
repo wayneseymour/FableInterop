@@ -43,18 +43,12 @@ match parseFloat "5x" with
 
 type IJQuery = interface end
 
-// JQuery.ready (fun () ->
-//    let div = JQuery.select "#main"
- 
-//    div
-//    |> JQuery.css "background-color" "red"
-//    |> JQuery.click (fun ev -> console.log("Clicked"))
-//    |> JQuery.addClass "fancy-class"
-//    |> ignore
-// )
-
 
 module JQuery = 
+
+  [<Emit("window['$']($0)")>]
+  let select (selector: string) : IJQuery = jsNative
+
 
   [<Emit("window['$']($0)")>]
   let ready (handler: unit -> unit) : unit = jsNative
@@ -67,3 +61,13 @@ module JQuery =
   
   [<Emit("$1.click($0)")>]
   let click (handler: obj -> unit)  (el: IJQuery) : IJQuery = jsNative
+
+JQuery.ready (fun () ->
+   let div = JQuery.select "#main"
+ 
+   div
+   |> JQuery.css "background-color" "red"
+   |> JQuery.click (fun ev -> console.log("Clicked"))
+   |> JQuery.addClass "fancy-class"
+   |> ignore
+)
