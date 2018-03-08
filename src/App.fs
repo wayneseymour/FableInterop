@@ -3,6 +3,7 @@ module FableInterop
 open Fable.Core
 open Fable.Core.JsInterop
 open Fable.Import.Browser
+open System
 
 console.log("Fable is up and running...YO!");
 
@@ -42,16 +43,14 @@ match parseFloat "5x" with
 | None -> console.log("No result found")   //  logs "No result found"
 
 
-module JQuery = 
-  [<Emit("window['$']($0)")>]
-  let select (selector: string) = jsNative
-  
-let div = JQuery.select "#main"
+type AddTimeProps = 
+  abstract current : DateTime with get, set
+  abstract amount : int with get, set
+  abstract unit : string with get, set
 
-// here comes the dynamic programming model:
-!!div?css("any","prop")?html("non-empty")?fade(400) 
+let parameter = createEmpty<AddTimeProps>
+parameter.current <- DateTime.Now
+parameter.amount <- 20
+parameter.unit <- "days"
 
-// will compile to:
-// const div = window['$']("#main")
-//
-// div.css("any", "prop").html("non-empty").fade(400)
+console.log(parameter) 
